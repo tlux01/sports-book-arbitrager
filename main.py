@@ -49,8 +49,8 @@ url = 'https://www.sportsplays.com/pick/eventList/sport_id/1.html'
 s = requests.session()
 
 login_data = {
-    'username' : 'edward30@my.canisius.edu',
-    'password': 'spo12344te',
+    'username' : 'youruser',
+    'password': 'yourpass',
 }
 response = s.post(url, data=login_data)
 r = s.get('https://www.sportsplays.com/pick/eventList/sport_id/1.html')
