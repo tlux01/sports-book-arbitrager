@@ -11,7 +11,7 @@ def scrape_nfl():
     game_odds = []
     for game in games:
         print(game)
-        # gets date of game, need to divide gamestamp by factor of 1000
+        # gets date of game, need to divide timestamp by factor of 1000
         date = datetime.fromtimestamp(game["startTime"]/1000)
         teams = [team["name"] for team in game["competitors"]]
         point_spreads_dict = [team for team in game["displayGroups"][0]["markets"] 
@@ -51,7 +51,7 @@ def scrape_nfl():
             "O/U": over_under         
         }
         game_odds.append(line)
-    print(game_odds)
+    #print(game_odds)
     return game_odds
 
 scrape_nfl()
