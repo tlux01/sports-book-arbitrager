@@ -1,13 +1,27 @@
 from bs4 import BeautifulSoup
 import requests
 from datetime import datetime
+import pprint
+
+KEYWORDS = {
+    'NFL': {
+        "Spread" : "Point Spread",
+        "Moneyline" : "Moneyline",
+        "O/U" : "Total"
+    },
+    'SOC': {
+        "Spread" : "Goal Spread",
+        "Moneyline" : "3-Way Moneyline",
+        "O/U" : "Total"
+    }    
+}
 
 
 def scrape_nfl():
     url = "https://www.bovada.lv/services/sports/event/coupon/events/A/description/football/nfl?marketFilterId=def&preMatchOnly=true&lang=en"
     r = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}).json()
     # we get a list of length 1, need to index into it
-    data = {"NFL": get_odds(r[0])}
+    data = {"NFL": get_odds(r[0], "NFL")}
     return data
 
 def scrape_soccer():
@@ -17,11 +31,11 @@ def scrape_soccer():
     data = {"SOC": []}
     print(len(r))
     for games in r:
-        game_odds = get_odds(games)
+        game_odds = get_odds(games, "SOC")
         data["SOC"].extend(game_odds)
     return data
 
-def get_odds(games):
+def get_odds(games, sport):
     game_odds = []
     for game in games['events']:
         point_spreads = None
@@ -31,7 +45,7 @@ def get_odds(games):
         date = datetime.fromtimestamp(game["startTime"]/1000)
         teams = [team["name"] for team in game["competitors"]]
         point_spreads_dict = [team for team in game["displayGroups"][0]["markets"] 
-                                if team["description"] == "Goal Spread"]
+                                if team["description"] == KEYWORDS[sport]["Spread"]]
         if (point_spreads_dict):
             point_spreads = [
                 {
@@ -43,7 +57,7 @@ def get_odds(games):
             ]
        
         moneyline_dict = [team for team in game["displayGroups"][0]["markets"] 
-                                if team["description"] == "3-Way Moneyline"]
+                                if team["description"] == KEYWORDS[sport]["Moneyline"]]
         if (moneyline_dict):
             moneyline = [
                 {
@@ -53,7 +67,7 @@ def get_odds(games):
                 for team in moneyline_dict[0]["outcomes"]
             ]
         over_under_dict = [team for team in game["displayGroups"][0]["markets"] 
-                                if team["description"] == "Total"]
+                                if team["description"] == KEYWORDS[sport]["O/U"]]
         if (over_under_dict):
             over_under = [
                 {
@@ -73,4 +87,4 @@ def get_odds(games):
         game_odds.append(line)
     return game_odds
 
-print(scrape_soccer())
+pprint.pprint(scrape_nfl())
