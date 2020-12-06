@@ -10,39 +10,46 @@ def scrape_nfl():
     games = r[0]["events"]
     game_odds = []
     for game in games:
+        point_spreads = None
+        moneyline = None
+        over_under = None
         print(game)
         # gets date of game, need to divide timestamp by factor of 1000
         date = datetime.fromtimestamp(game["startTime"]/1000)
         teams = [team["name"] for team in game["competitors"]]
         point_spreads_dict = [team for team in game["displayGroups"][0]["markets"] 
-                                if team["description"] == "Point Spread"][0]
-        point_spreads = [
-            {
-                "team": team["description"],
-                "handicap": team["price"]["handicap"],
-                "price": team["price"]["american"]
-            }
-            for team in point_spreads_dict["outcomes"]
-        ]
+                                if team["description"] == "Point Spread"]
+        if (point_spreads_dict):
+            point_spreads = [
+                {
+                    "team": team["description"],
+                    "handicap": team["price"]["handicap"],
+                    "price": team["price"]["american"]
+                }
+                for team in point_spreads_dict[0]["outcomes"]
+            ]
+       
         moneyline_dict = [team for team in game["displayGroups"][0]["markets"] 
-                                if team["description"] == "Moneyline"][0]
-        moneyline = [
-            {
-                "team": team["description"],
-                "price": team["price"]["american"]
-            }
-            for team in moneyline_dict["outcomes"]
-        ]
+                                if team["description"] == "Moneyline"]
+        if (moneyline):
+            moneyline = [
+                {
+                    "team": team["description"],
+                    "price": team["price"]["american"]
+                }
+                for team in moneyline_dict[0]["outcomes"]
+            ]
         over_under_dict = [team for team in game["displayGroups"][0]["markets"] 
-                                if team["description"] == "Total"][0]
-        over_under = [
-            {
-                "type": team["description"],
-                "handicap": team["price"]["handicap"],
-                "price": team["price"]["american"]
-            }
-            for team in over_under_dict["outcomes"]
-        ]
+                                if team["description"] == "Total"]
+        if (over_under_dict):
+            over_under = [
+                {
+                    "type": team["description"],
+                    "handicap": team["price"]["handicap"],
+                    "price": team["price"]["american"]
+                }
+                for team in over_under_dict[0]["outcomes"]
+            ]
         line = {
             "date": date, 
             "teams": teams, 
@@ -51,7 +58,7 @@ def scrape_nfl():
             "O/U": over_under         
         }
         game_odds.append(line)
-    #print(game_odds)
+    print(game_odds)
     return game_odds
 
 scrape_nfl()
