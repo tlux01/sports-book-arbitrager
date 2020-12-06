@@ -11,10 +11,11 @@ def scrape_nfl():
     return data
 
 def scrape_soccer():
-    url = "https://www.bovada.lv/services/sports/event/coupon/events/A/description/soccer?marketFilterId=def&preMatchOnly=true&eventsLimit=50&eventsOffset=100&lang=en"
+    url = "https://www.bovada.lv/services/sports/event/coupon/events/A/description/soccer?marketFilterId=def&preMatchOnly=true&eventsLimit=100&eventsOffset=0&lang=en"
     r = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}).json()
     # soccer has multiple leagues so our api returns a list of objects with events
     data = {"SOC": []}
+    print(len(r))
     for games in r:
         game_odds = get_odds(games)
         data["SOC"].extend(game_odds)
@@ -26,12 +27,11 @@ def get_odds(games):
         point_spreads = None
         moneyline = None
         over_under = None
-        print(game)
         # gets date of game, need to divide timestamp by factor of 1000
         date = datetime.fromtimestamp(game["startTime"]/1000)
         teams = [team["name"] for team in game["competitors"]]
         point_spreads_dict = [team for team in game["displayGroups"][0]["markets"] 
-                                if team["description"] == "Point Spread"]
+                                if team["description"] == "Goal Spread"]
         if (point_spreads_dict):
             point_spreads = [
                 {
@@ -43,8 +43,8 @@ def get_odds(games):
             ]
        
         moneyline_dict = [team for team in game["displayGroups"][0]["markets"] 
-                                if team["description"] == "Moneyline"]
-        if (moneyline):
+                                if team["description"] == "3-Way Moneyline"]
+        if (moneyline_dict):
             moneyline = [
                 {
                     "team": team["description"],
