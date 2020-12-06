@@ -4,7 +4,7 @@ from datetime import datetime
 import pprint
 
 KEYWORDS = {
-    'NFL': {
+    'DEFAULT': {
         "Spread" : "Point Spread",
         "Moneyline" : "Moneyline",
         "O/U" : "Total"
@@ -21,7 +21,7 @@ def scrape_nfl():
     url = "https://www.bovada.lv/services/sports/event/coupon/events/A/description/football/nfl?marketFilterId=def&preMatchOnly=true&lang=en"
     r = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}).json()
     # we get a list of length 1, need to index into it
-    data = {"NFL": get_odds(r[0], "NFL")}
+    data = {"NFL": get_odds(r[0], "DEFAULT")}
     return data
 
 def scrape_soccer():
