@@ -59,9 +59,12 @@ def sports_plays_scraper(scraped_url):
 
     s = requests.session()
 
+    with open("auth.txt", 'r') as f:
+        credentials = f.readlines()
+
     login_data = {
-        'username' : '',
-        'password': '',
+        'username' : credentials[0].strip('\n'),
+        'password': credentials[1],
     }
 
     response = s.post(url, data=login_data)
