@@ -1,0 +1,32 @@
+#normal urls
+NFL_url = ['https://www.sportsplays.com/pick/eventList/sport_id/1.html',
+ 'https://www.sportsplays.com/pick/eventList/sport_id/1/pick_type/first_half.html',
+ 'https://www.sportsplays.com/pick/eventList/sport_id/1/pick_type/first_quarter.html',
+ 'https://www.sportsplays.com/pick/eventList/sport_id/1/pick_type/second_half.html']
+
+college_football = ['https://www.sportsplays.com/pick/eventList/sport_id/2.html',
+ 'https://www.sportsplays.com/pick/eventList/sport_id/2/pick_type/first_half.html',
+ 'https://www.sportsplays.com/pick/eventList/sport_id/2/pick_type/first_quarter.html',
+ 'https://www.sportsplays.com/pick/eventList/sport_id/2/pick_type/second_half.html']
+
+NBA_basketball= ['https://www.sportsplays.com/pick/eventList/sport_id/4.html',
+ 'https://www.sportsplays.com/pick/eventList/sport_id/4/pick_type/first_half.html',
+ 'https://www.sportsplays.com/pick/eventList/sport_id/4/pick_type/first_quarter.html',
+ 'https://www.sportsplays.com/pick/eventList/sport_id/4/pick_type/second_half.html']
+
+college_basketball = ['https://www.sportsplays.com/pick/eventList/sport_id/5.html',
+ 'https://www.sportsplays.com/pick/eventList/sport_id/5/pick_type/first_half.html',
+ 'https://www.sportsplays.com/pick/eventList/sport_id/5/pick_type/first_quarter.html',
+ 'https://www.sportsplays.com/pick/eventList/sport_id/5/pick_type/second_half.html']
+
+golf = ['https://www.sportsplays.com/pick/eventList/sport_id/19.html']
+
+tennis = [ 'https://www.sportsplays.com/pick/eventList/sport_id/12.html']
+
+#abnormal urls
+soccer = ['https://www.sportsplays.com/pick/eventList/sport_id/10.html']
+
+fighting = ['https://www.sportsplays.com/pick/eventList/sport_id/13.html',
+ 'https://www.sportsplays.com/pick/eventList/sport_id/13/pick_type/first_half.html',
+ 'https://www.sportsplays.com/pick/eventList/sport_id/13/pick_type/first_quarter.html',
+ 'https://www.sportsplays.com/pick/eventList/sport_id/13/pick_type/second_half.html']
