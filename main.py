@@ -49,8 +49,8 @@ def sports_plays_scraper():
     s = requests.session()
 
     login_data = {
-        'username' : 'edward30@my.canisius.edu',
-        'password': 'spo12344te',
+        'username' : '',
+        'password': '',
     }
     response = s.post(url, data=login_data)
 
