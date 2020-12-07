@@ -2,8 +2,11 @@ import requests
 
 from bs4 import BeautifulSoup
 
-user_name = ''
-password = ''
+with open('auth.txt', 'r') as f:
+    credentials = f.readlines()
+    user_name = credentials[0].strip('\n')
+    password = credentials[1].strip('\n')
+
 #normal urls
 nfl_url = ['https://www.sportsplays.com/pick/eventList/sport_id/1.html',
  'https://www.sportsplays.com/pick/eventList/sport_id/1/pick_type/first_half.html',
@@ -634,4 +637,4 @@ def fighting_sp_scraper():
 
 
 
-fighting_sp_scraper()
+nfl_sp_scraper()
