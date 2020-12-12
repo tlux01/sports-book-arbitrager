@@ -18,10 +18,16 @@ KEYWORDS = {
 
 
 def scrape_nfl():
-    url = "https://www.bovada.lv/services/sports/event/coupon/events/A/description/football/nfl?marketFilterId=def&preMatchOnly=true&lang=en"
-    r = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}).json()
+    urls = {
+        "Total Game": "https://www.bovada.lv/services/sports/event/coupon/events/A/description/football/nfl?marketFilterId=def&preMatchOnly=true&lang=en",
+        "First Half": "https://www.bovada.lv/services/sports/event/coupon/events/A/description/football/nfl?marketFilterId=701&preMatchOnly=true&lang=en"
+    }
+    data = {}
     # we get a list of length 1, need to index into it
-    data = {"NFL": get_odds(r[0], "DEFAULT")}
+    for period in urls:
+        r = requests.get(urls[period], headers={'User-Agent': 'Mozilla/5.0'}).json()
+        odds = get_odds(r[0], "DEFAULT")
+        data[period] = odds
     return data
 
 def scrape_soccer():
