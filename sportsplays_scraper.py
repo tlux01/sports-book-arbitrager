@@ -71,13 +71,13 @@ def parse_over_under(over_under_txt):
             over_under = {
                 "type": 'Over',
                 "price": re.search('[(]?[+,-]\d*[)]', over_under_txt).group().strip('(').strip(')'),
-                "handicap": re.search('[+,-]?\d*[.]?\d*', over_under_txt).group()
+                "handicap": re.search('O \d*[.]?\d*', over_under_txt).group().strip('O ')
             }
         elif over_under_txt[0] == "U":
             over_under = {
                 "type": 'Under',
                 "price": re.search('[(]?[+,-]\d*[)]', over_under_txt).group().strip('(').strip(')'),
-                "handicap": re.search('[+,-]?\d*[.]?\d*', over_under_txt).group()
+                "handicap": re.search('U \d*[.]?\d*', over_under_txt).group().strip('U ')
             }
     return over_under
 
