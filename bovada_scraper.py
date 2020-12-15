@@ -17,7 +17,7 @@ KEYWORDS = {
 }
 
 
-def scrape_nfl():
+def nfl_bv_scraper():
     urls = {
         "Total Game": "https://www.bovada.lv/services/sports/event/coupon/events/A/description/football/nfl?marketFilterId=def&preMatchOnly=true&lang=en",
         "First Half": "https://www.bovada.lv/services/sports/event/coupon/events/A/description/football/nfl?marketFilterId=701&preMatchOnly=true&lang=en"
@@ -30,67 +30,73 @@ def scrape_nfl():
         data[period] = odds
     return data
 
-def scrape_soccer():
-    url = "https://www.bovada.lv/services/sports/event/coupon/events/A/description/soccer?marketFilterId=def&preMatchOnly=true&eventsLimit=100&eventsOffset=0&lang=en"
-    r = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}).json()
+def soccer_bv_scraper():
+    urls = {"Total Game": "https://www.bovada.lv/services/sports/event/coupon/events/A/description/soccer?marketFilterId=def&preMatchOnly=true&eventsLimit=500&eventsOffset=0&lang=en"}
     # soccer has multiple leagues so our api returns a list of objects with events
-    data = {"SOC": []}
-    print(len(r))
-    for games in r:
-        game_odds = get_odds(games, "SOC")
-        data["SOC"].extend(game_odds)
+    data = {}
+    for period in urls:
+        url = urls[period]
+        r = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}).json()
+        odds_list = []
+        for games in r:
+            odds = get_odds(games, "SOC")
+            odds_list.extend(odds)
+        data[period] = odds_list
     return data
 
 def get_odds(games, sport):
     game_odds = []
     for game in games['events']:
         point_spreads = None
-        moneyline = None
-        over_under = None
+        moneylines = None
+        over_unders = None
         # gets date of game, need to divide timestamp by factor of 1000
         date = datetime.fromtimestamp(game["startTime"]/1000)
         teams = [team["name"] for team in game["competitors"]]
         point_spreads_dict = [team for team in game["displayGroups"][0]["markets"] 
                                 if team["description"] == KEYWORDS[sport]["Spread"]]
-        if (point_spreads_dict):
-            point_spreads = [
-                {
-                    "team": team["description"],
-                    "handicap": team["price"]["handicap"],
-                    "price": team["price"]["american"]
+        if (point_spreads_dict and point_spreads_dict[0]["outcomes"]):
+            point_spreads = {}
+            for team in point_spreads_dict[0]["outcomes"]:
+                point_spread = {
+                    team["description"]: {
+                        "handicap": team["price"]["handicap"],
+                        "price": team["price"]["american"]
+                    }
                 }
-                for team in point_spreads_dict[0]["outcomes"]
-            ]
+                point_spreads = {**point_spreads, **point_spread}
        
         moneyline_dict = [team for team in game["displayGroups"][0]["markets"] 
                                 if team["description"] == KEYWORDS[sport]["Moneyline"]]
-        if (moneyline_dict):
-            moneyline = [
-                {
-                    "team": team["description"],
-                    "price": team["price"]["american"]
+        if (moneyline_dict and moneyline_dict[0]["outcomes"]):
+            moneylines = {}
+            for team in moneyline_dict[0]["outcomes"]:
+                moneyline = {
+                    team["description"] : {
+                        "price": team["price"]["american"]
+                    }
                 }
-                for team in moneyline_dict[0]["outcomes"]
-            ]
+                moneylines = {**moneylines, **moneyline}
+
         over_under_dict = [team for team in game["displayGroups"][0]["markets"] 
                                 if team["description"] == KEYWORDS[sport]["O/U"]]
-        if (over_under_dict):
-            over_under = [
-                {
-                    "type": team["description"],
-                    "handicap": team["price"]["handicap"],
-                    "price": team["price"]["american"]
+        if (over_under_dict and over_under_dict[0]["outcomes"]):
+            over_unders = {}
+            for team in over_under_dict[0]["outcomes"]:
+                over_under = {
+                    team["description"]: {
+                        "handicap": team["price"]["handicap"],
+                        "price": team["price"]["american"]
+                    }
                 }
-                for team in over_under_dict[0]["outcomes"]
-            ]
+            over_unders = {**over_unders, **over_under}
+                    
         line = {
             "date": date, 
             "teams": teams, 
             "point spread": point_spreads,
-            "moneyline": moneyline, 
-            "O/U": over_under         
+            "moneyline": moneylines, 
+            "O/U": over_unders         
         }
         game_odds.append(line)
     return game_odds
-
-pprint.pprint(scrape_nfl())

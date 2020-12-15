@@ -46,8 +46,9 @@ def find_end(tr_list):
 
 def parse_moneyline(moneyline_txt, team):
     moneyline = {
-        "team": team,
-        "price": moneyline_txt
+        team : {
+            "price": moneyline_txt
+        }
     } if moneyline_txt != "" else None
     return moneyline
 
@@ -56,9 +57,10 @@ def parse_spread(point_spread_txt, team):
         point_spread_txt = point_spread_txt.replace("pick", "0")
 
     point_spread = {
-        "team": team,
-        "price": re.search('[(]?[+,-]\d*[)]', point_spread_txt).group().strip('(').strip(')'),
-        "handicap": re.search('[+,-]?\d*[.]?\d*', point_spread_txt).group()
+        team : {
+            "price": re.search('[(]?[+,-]\d*[)]', point_spread_txt).group().strip('(').strip(')'),
+            "handicap": re.search('[+,-]?\d*[.]?\d*', point_spread_txt).group()
+        }
     } if point_spread_txt != "" else None
     return point_spread  
 
@@ -69,15 +71,18 @@ def parse_over_under(over_under_txt):
     else:
         if over_under_txt[0] == "O":
             over_under = {
-                "type": 'Over',
-                "price": re.search('[(]?[+,-]\d*[)]', over_under_txt).group().strip('(').strip(')'),
-                "handicap": re.search('O \d*[.]?\d*', over_under_txt).group().strip('O ')
+                'Over': {
+                    "price": re.search('[(]?[+,-]\d*[)]', over_under_txt).group().strip('(').strip(')'),
+                    "handicap": re.search('O \d*[.]?\d*', over_under_txt).group().strip('O ')
+                }   
             }
         elif over_under_txt[0] == "U":
             over_under = {
-                "type": 'Under',
-                "price": re.search('[(]?[+,-]\d*[)]', over_under_txt).group().strip('(').strip(')'),
-                "handicap": re.search('U \d*[.]?\d*', over_under_txt).group().strip('U ')
+                'Under':
+                    {
+                        "price": re.search('[(]?[+,-]\d*[)]', over_under_txt).group().strip('(').strip(')'),
+                        "handicap": re.search('U \d*[.]?\d*', over_under_txt).group().strip('U ')
+                    }
             }
     return over_under
 
@@ -111,9 +116,9 @@ def nfl_sp_scraper(session):
                 game_date = td_list[0].text.strip('\n').strip('(All Times EST)')
                 
             else:
-                point_spreads = []
-                moneylines = []
-                over_unders = []
+                point_spreads = {}
+                moneylines = {}
+                over_unders = {}
                 teams = []
                 game_time = None
                 for row in range(game_block_size):
@@ -136,9 +141,12 @@ def nfl_sp_scraper(session):
                     moneyline = parse_moneyline(moneyline_txt, team)
 
                     teams.append(team)
-                    point_spreads.append(point_spread)
-                    over_unders.append(over_under)
-                    moneylines.append(moneyline)
+                    if point_spread:
+                        point_spreads = {**point_spreads, **point_spread}
+                    if over_under:
+                        over_unders = {**over_unders, **over_under}
+                    if moneyline:
+                        moneylines = {**moneylines, **moneyline}
                 line = {
                     "date": game_time, "teams": teams, "point spread": point_spreads,
                     "moneyline": moneylines, "O/U": over_unders
@@ -174,9 +182,9 @@ def soccer_sp_scraper(session):
                 game_date = td_list[0].text.strip('\n').strip('(All Times EST)')
                 
             else:
-                point_spreads = []
-                moneylines = []
-                over_unders = []
+                point_spreads = {}
+                moneylines = {}
+                over_unders = {}
                 teams = []
                 game_time = None
                 for row in range(game_block_size):
@@ -198,16 +206,17 @@ def soccer_sp_scraper(session):
                         over_under = parse_over_under(over_under_txt)  
                         moneyline_txt = td_list[4].text.strip()
                         moneyline = parse_moneyline(moneyline_txt, team)
-                        point_spreads.append(point_spread)
-                        over_unders.append(over_under)
+                        if point_spread:
+                            point_spreads = {**point_spreads, **point_spread}
+                        if over_under:
+                            over_unders = {**over_unders, **over_under}
                         teams.append(team)
                     # draw row
                     else:
                         moneyline_txt = td_list[2].text.strip()
-                        moneyline = parse_moneyline(moneyline_txt, team)
-                    
-                    
-                    moneylines.append(moneyline)
+                        moneyline = parse_moneyline(moneyline_txt, team)       
+                    if moneyline:
+                        moneylines = {**moneylines, **moneyline}
                 line = {
                     "date": game_time, "teams": teams, "point spread": point_spreads,
                     "moneyline": moneylines, "O/U": over_unders
@@ -217,4 +226,3 @@ def soccer_sp_scraper(session):
                 i += game_block_size
         data[period] = game_odds
     return data
-pprint.pprint(soccer_sp_scraper(session))
