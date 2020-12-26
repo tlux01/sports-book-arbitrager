@@ -1,6 +1,7 @@
 import re
-from bovada_scraper import *
-from sportsplays_scraper import *
+from bovada_scraper import nfl_bv_scraper, soccer_bv_scraper, nba_bv_scraper
+from sportsplays_scraper import nfl_sp_scraper, soccer_sp_scraper, nba_sp_scraper
+from datetime import datetime, timedelta
 LINE_THRESHOLDS = {
     "moneyline" : .01
 }
@@ -50,14 +51,14 @@ def compare_lines(sportplays_lines, bovada_lines, sport, period):
         matched = False
         for bv_game in bv_line:
             if bv_game['teams'][0] in sp_game['teams'] and bv_game['teams'][1] in sp_game['teams']\
-                                                        and bv_game['date'] == sp_game['date']:
+                                                        and abs(bv_game['date'] - sp_game['date']) < timedelta(hours = 6):
                 compare_matched_money_line(bv_game, sp_game, profitable_moneyline_bets, sport, period)
                 matched = True
                 break
         # might have to deal with case where team names don't exactly match
         if not matched:
             not_matched.append(sp_game)
-    print("Unmatched Lines: {}/{}".format(len(not_matched),len(sp_line) - len(not_matched)))
+    print("Unmatched Lines: {}/{}".format(len(not_matched),len(sp_line)))
     print_game_detail(not_matched)
     return profitable_moneyline_bets
 
@@ -66,7 +67,7 @@ def print_game_detail(lines):
         print("{} vs {} on {}".format(line['teams'][0], line['teams'][1], line["date"]))
 
 def compare_nfl_lines(session):
-    periods = ["Total Game"]
+    periods = ["Total Game", "First Half"]
     bv_data = nfl_bv_scraper()
     sp_data = nfl_sp_scraper(session)
     profitable_bets = []
@@ -76,9 +77,18 @@ def compare_nfl_lines(session):
 
 def compare_soccer_lines(session):
     periods = ["Total Game"]
-    bv_data = nfl_bv_scraper()
-    sp_data = nfl_sp_scraper(session)
+    bv_data = soccer_bv_scraper()
+    sp_data = soccer_sp_scraper(session)
     profitable_bets = []
     for period in periods:
         profitable_bets.extend(compare_lines(sp_data, bv_data, 'SOC', period))
+    return profitable_bets
+
+def compare_nba_lines(session):
+    periods = ["Total Game"]
+    bv_data = nba_bv_scraper()
+    sp_data = nba_sp_scraper(session)
+    profitable_bets = []
+    for period in periods:
+        profitable_bets.extend(compare_lines(sp_data, bv_data, 'NBA', period))
     return profitable_bets

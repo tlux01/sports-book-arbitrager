@@ -159,8 +159,8 @@ def nfl_sp_scraper(session):
                 #captures odds
                 game_odds.append(line)
                 i += game_block_size
-            data[period] = game_odds
-        return data
+        data[period] = game_odds
+    return data
 
 def soccer_sp_scraper(session): 
     soccer_urls = {'Total Game':'https://www.sportsplays.com/pick/eventList/sport_id/10.html'}                       
@@ -220,6 +220,80 @@ def soccer_sp_scraper(session):
                     else:
                         moneyline_txt = td_list[2].text.strip()
                         moneyline = parse_moneyline(moneyline_txt, team)       
+                    if moneyline:
+                        moneylines = {**moneylines, **moneyline}
+                line = {
+                    "date": game_time, "teams": teams, "point spread": point_spreads,
+                    "moneyline": moneylines, "O/U": over_unders
+                }
+                #captures odds
+                game_odds.append(line)
+                i += game_block_size
+        data[period] = game_odds
+    return data
+
+
+def nba_sp_scraper(session):
+    #session = create_sportsplays_session()
+    nba_url = {
+        'Total Game': 'https://www.sportsplays.com/pick/eventList/sport_id/4.html',
+        'First Half': 'https://www.sportsplays.com/pick/eventList/sport_id/4/pick_type/first_half.html',
+        'First Quarter': 'https://www.sportsplays.com/pick/eventList/sport_id/4/pick_type/first_quarter.html',
+        'Second Half': 'https://www.sportsplays.com/pick/eventList/sport_id/4/pick_type/second_half.html'
+    }
+    data = {}
+    for period in nba_url:
+        url = nba_url[period]
+        tr_list = get_bet_table_tr_list(session, url)
+        game_odds = []
+        # skip over if tr_list is empty
+        if len(tr_list) == 0:
+            data[period] = game_odds
+            continue
+        start = find_start(tr_list)
+        end = find_end(tr_list)
+        # block size of 2 a only 2 rows per game
+        game_odds = []
+        game_date = None
+        game_block_size = 2
+        i = start
+        while i < end:
+            tr = tr_list[i]
+            td_list = tr.findAll('td')
+            if td_list[0].find('strong'):
+                i += 1
+                game_date = td_list[0].text.strip('\n').strip('(All Times EST)')
+                
+            else:
+                point_spreads = {}
+                moneylines = {}
+                over_unders = {}
+                teams = []
+                game_time = None
+                for row in range(game_block_size):
+                    tr = tr_list[i + row]
+                    td_list = tr.findAll('td')
+                    point_spread = None
+                    moneyline = None
+                    over_under = None
+                    # checks if string matches time
+                    if re.search("\d{1,2}[:]+\d{2}(am|pm)+", td_list[0].text.strip()):
+                        game_time = game_date + ' ' + td_list[0].text.strip()
+                        game_time = datetime.strptime(game_time, '%B %d, %Y %I:%M%p')
+
+                    team = td_list[1].text.strip()
+                    point_spread_txt = td_list[2].text.strip()
+                    point_spread = parse_spread(point_spread_txt, team)
+                    over_under_txt = td_list[3].text.strip()
+                    over_under = parse_over_under(over_under_txt)
+                    moneyline_txt = td_list[4].text.strip()
+                    moneyline = parse_moneyline(moneyline_txt, team)
+
+                    teams.append(team)
+                    if point_spread:
+                        point_spreads = {**point_spreads, **point_spread}
+                    if over_under:
+                        over_unders = {**over_unders, **over_under}
                     if moneyline:
                         moneylines = {**moneylines, **moneyline}
                 line = {

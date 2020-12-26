@@ -26,6 +26,7 @@ def nfl_bv_scraper():
     # we get a list of length 1, need to index into it
     for period in urls:
         r = requests.get(urls[period], headers={'User-Agent': 'Mozilla/5.0'}).json()
+        # NFL is its own league, so list is of size one
         odds = get_odds(r[0], "DEFAULT")
         data[period] = odds
     return data
@@ -42,6 +43,18 @@ def soccer_bv_scraper():
             odds = get_odds(games, "SOC")
             odds_list.extend(odds)
         data[period] = odds_list
+    return data
+
+def nba_bv_scraper():
+    urls = {
+        "Total Game" : "https://www.bovada.lv/services/sports/event/coupon/events/A/description/basketball/nba?marketFilterId=def&preMatchOnly=true&lang=en"
+    }
+    data = {}
+    for period in urls:
+        r = requests.get(urls[period], headers={'User-Agent': 'Mozilla/5.0'}).json()
+        # NFL is its own league, so list is of size one
+        odds = get_odds(r[0], "DEFAULT")
+        data[period] = odds
     return data
 
 def get_odds(games, sport):
