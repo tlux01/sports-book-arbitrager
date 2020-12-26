@@ -31,7 +31,7 @@ def nfl_bv_scraper():
     return data
 
 def soccer_bv_scraper():
-    urls = {"Total Game": "https://www.bovada.lv/services/sports/event/coupon/events/A/description/soccer?marketFilterId=def&preMatchOnly=true&eventsLimit=500&eventsOffset=0&lang=en"}
+    urls = {"Total Game": "https://www.bovada.lv/services/sports/event/coupon/events/A/description/soccer?marketFilterId=def&preMatchOnly=true&eventsLimit=1000&eventsOffset=0&lang=en"}
     # soccer has multiple leagues so our api returns a list of objects with events
     data = {}
     for period in urls:
