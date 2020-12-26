@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup
 import pprint
 from datetime import datetime
 import re
+from exceptions import InvalidSessionError
+
 
 # sportsplays cookie is responsible for keeping you logged in v
 def create_sportsplays_session():
@@ -29,6 +31,9 @@ def get_bet_table_tr_list(session, url):
     #entry point for url
     r = session.get(url)
     soup = BeautifulSoup(r.content, 'html.parser')
+    bet_table = soup.find(id = 'ajax_tabs_event_list')
+    if not bet_table:
+        raise InvalidSessionError()
     bet_table = soup.find(id = 'ajax_tabs_event_list')
     tr_list = bet_table.findAll('tr')
     return tr_list
