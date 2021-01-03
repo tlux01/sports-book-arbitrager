@@ -25,7 +25,7 @@ def run():
             session = create_sportsplays_session()
             num_error += 1
         
-        time.sleep(60*30)
+        time.sleep(30*60)
 
 if __name__ == '__main__':
     run()

@@ -52,7 +52,7 @@ def compare_lines(sportplays_lines, bovada_lines, sport, period):
         for bv_game in bv_line:
             if bv_game['teams'][0] in sp_game['teams'] and bv_game['teams'][1] in sp_game['teams']\
                                                         and abs(bv_game['date'] - sp_game['date']) < timedelta(hours = 6):
-                compare_matched_money_line(bv_game, sp_game, profitable_moneyline_bets, sport, period)
+                compare_matched_money_line(sp_game, bv_game, profitable_moneyline_bets, sport, period)
                 matched = True
                 break
         # might have to deal with case where team names don't exactly match
