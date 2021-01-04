@@ -27,7 +27,9 @@ def nfl_bv_scraper():
     for period in urls:
         r = requests.get(urls[period], headers={'User-Agent': 'Mozilla/5.0'}).json()
         # NFL is its own league, so list is of size one
-        odds = get_odds(r[0], "DEFAULT")
+        odds = []
+        if len(r) > 0:
+            odds = get_odds(r[0], "DEFAULT")
         data[period] = odds
     return data
 
